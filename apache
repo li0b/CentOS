@@ -1,0 +1,110 @@
+/* Apache(以後、httpdと呼称)のインストール */
+[root@centos ~]# yum -y install httpd
+
+/* php, php-mbstringインストール */
+[root@centos ~]# yum -y install php php-mbstring
+
+/* httpの設定 */
+[root@centos ~]# vi /etc/httpd/conf/httpd.conf
+
+ServerTokens OS
+↓
+ServerTokens Prod　←　エラーページ等でOS名を表示しないようにする[変更]
+
+#ServerName www.example.com:80
+↓
+ServerName centossrv.com:80　←　サーバー名を指定[変更]
+
+<Directory "/var/www/html">
+
+#
+# Possible values for the Options directive are "None", "All",
+# or any combination of:
+#   Indexes Includes FollowSymLinks SymLinksifOwnerMatch ExecCGI MultiViews
+#
+# Note that "MultiViews" must be named *explicitly* --- "Options All"
+# doesn't give it to you.
+#
+# The Options directive is both complicated and important.  Please see
+# http://httpd.apache.org/docs-2.0/mod/core.html#options
+# for more information.
+#
+    Options Indexes FollowSymLinks
+　　↓
+    Options Includes ExecCGI FollowSymLinks　←　CGI,SSIの許可[変更]
+
+#
+# AllowOverride controls what directives may be placed in .htaccess files.
+# It can be "All", "None", or any combination of the keywords:
+#   Options FileInfo AuthConfig Limit
+#
+    AllowOverride None
+　　↓
+    AllowOverride All　←　.htaccessの許可[変更]
+
+#
+# The following directives define some format nicknames for use with
+# a CustomLog directive (see below).
+#
+LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+↓
+LogFormat "%h %l %u %t \"%!414r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined　←　長いURI(414エラー)はログに記録しない[変更]
+
+#
+# For a single logfile with access, agent, and referer information
+# (Combined Logfile Format), use the following directive:
+#
+SetEnvIf Request_URI "default\.ida" no_log　←　追加(wormからのアクセスをログに記録しない)[変更]
+SetEnvIf Request_URI "cmd\.exe" no_log　←　〃
+SetEnvIf Request_URI "root\.exe" no_log　←　〃
+SetEnvIf Request_URI "Admin\.dll" no_log　←　〃
+SetEnvIf Request_URI "NULL\.IDA" no_log　←　〃　
+SetEnvIf Remote_Addr 192.168.0 no_log　←　追加(内部からのアクセスをログに記録しない)[変更]
+SetEnvIf Remote_Addr 127.0.0.1 no_log　←　追加(自ホストからのアクセスをログに記録しない)[変更]
+CustomLog logs/access_log combined env=!no_log　←　上記以外のアクセスをログに記録する[変更]
+
+ServerSignature On
+↓
+ServerSignature Off　←　エラーページでサーバー情報を表示しないようにする[変更]
+AddDefaultCharset UTF-8
+↓
+#AddDefaultCharset UTF-8　←　コメントアウト(文字化け対応)[変更]
+
+#AddHandler cgi-script .cgi
+↓
+AddHandler cgi-script .cgi .pl　←　CGIスクリプトに.plを追加[変更]
+
+<Directory "/var/www/icons">
+    Options Indexes MultiViews
+    ↓
+    Options MultiViews　←　iconsディレクトリのファイル一覧を表示しないようにする[変更]
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+</Directory>
+
+[root@centos ~]# rm -f /etc/httpd/conf.d/welcome.conf　←　テストページ削除
+
+[root@centos ~]# rm -f /var/www/error/noindex.html　←　テストページ削除
+
+/* Perlコマンドを/usr/local/bin/perlでアクセスできるよう設定 */
+[root@centos ~]# ln -s /usr/bin/perl /usr/local/bin/perl　←　/usr/local/bin/perlから/usr/bin/perlへのシンボリックリンク
+
+[root@centos ~]# whereis perl　←　Perlのパスを確認
+perl: /usr/bin/perl /usr/local/bin/perl /usr/share/man/man1/perl.1.gz　←　Perlのパス上に/usr/local/bin/perlの表示を確認
+
+/* ドキュメントルート所有者変更 */
+[root@centos ~]# chown centos. /var/www/html/　←　ドキュメントルート所有者を変更(centosは例)
+
+[root@centos ~]# ll /var/www/　←　ドキュメントルート所有者変更確認
+合計 24
+drwxr-xr-x  2 root      root      4096 10月  5 11:45 cgi-bin
+drwxr-xr-x  3 root      root      4096 10月  9 00:19 error
+drwxr-xr-x  5 centos    centos    4096  9月 27 17:43 html
+drwxr-xr-x  3 root      root      4096  9月 27 09:29 icons
+
+/* httpd起動 */
+[root@centos ~]# /etc/rc.d/init.d/httpd start　←　httpd起動
+httpd を起動中:                                            [  OK  ]
+
+[root@centos ~]# chkconfig httpd on　←　httpd自動起動設定
