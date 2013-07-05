@@ -1,0 +1,57 @@
+/* iptablesの確認 */
+[root@centos ~]# yum list | grep iptables
+
+/* iptablesがインストールされていない場合 */
+[root@centos ~]# yum -y iptables
+
+/* iptablesの自動起動 */
+[root@centos ~]# chkconfig iptables on
+
+/* iptablesの自動起動の確認 */
+[root@centos ~]# chkconfig --list iptables
+
+/* iptablesの設定確認 */
+[root@centos ~]# iptables -L
+
+/* iptablesの設定コピー */
+[root@centos ~]# cp -a /etc/sysconfig/iptables /etc/sysconfig/iptables.org
+
+/* iptablesの設定 */
+[root@centos ~]# vi /etc/sysconfig/iptables
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:RH-Firewall-1-INPUT - [0:0]
+-A INPUT -j RH-Firewall-1-INPUT
+-A FORWARD -j RH-Firewall-1-INPUT
+-A RH-Firewall-1-INPUT -i lo -j ACCEPT
+-A RH-Firewall-1-INPUT -p icmp --icmp-type any -j ACCEPT
+-A RH-Firewall-1-INPUT -p 50 -j ACCEPT
+-A RH-Firewall-1-INPUT -p 51 -j ACCEPT
+-A RH-Firewall-1-INPUT -p udp --dport 5353 -d 224.0.0.251 -j ACCEPT
+-A RH-Firewall-1-INPUT -p udp -m udp --dport 631 -j ACCEPT
+-A RH-Firewall-1-INPUT -p tcp -m tcp --dport 631 -j ACCEPT
+-A RH-Firewall-1-INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+# SSH
+-A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 2222 -j ACCEPT
+# HTTP
+-A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+# FTP
+-A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 20 -j ACCEPT
+# FTP
+-A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 21 -j ACCEPT
+# SMTP
+-A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 25 -j ACCEPT
+#■↓ POP3
+-A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 110 -j ACCEPT
+# HTTPS
+-A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 443 -j ACCEPT
+# OP25B対策（サブミッションポート）
+-A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 587 -j ACCEPT
+# MySQL（使用する場合）
+-A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT
+# PostgreSQL（使用する場合）
+-A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 5432 -j ACCEPT
+# Webmin（使用する場合）
+-A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 10000 -j ACCEPT
+-A RH-Firewall-1-INPUT -j REJECT --reject-with icmp-host-prohibited
