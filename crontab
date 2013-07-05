@@ -1,0 +1,17 @@
+/* crontabがインストールされているか確認 */
+[root@centos ~]# crontab -l
+
+/* crontabを新規インストールする場合 */
+[root@centos ~]# yum -y install crontabs
+
+/* crontabをパッケージでインストールする場合 */
+[root@centos ~]# yum -y install vixie-cron
+
+/* crontabの設定 */
+[root@centos ~]# vi /etc/crontab
+
+/* crontabの自動起動 */
+[root@centos ~]# chkconfig crond on
+
+/* crontabの自動起動確認*/
+[root@centos ~]# chkconfig --list crond
