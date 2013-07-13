@@ -1,0 +1,96 @@
+/* vsftpdのインストール */
+[root@centos ~]# yum -y install vsftpd
+
+/* vsftpd設定ファイル編集 */
+[root@centos ~]# vi /etc/vsftpd/vsftpd.conf
+# Allow anonymous FTP? (Beware - allowed by default if you comment this out).
+
+/* anonymousユーザ(匿名ユーザ)のログイン禁止 */
+anonymous_enable=NO
+
+# Activate logging of uploads/downloads.
+
+/* /var/log/vsftpd.logに接続・転送を記録(1/3) */
+xferlog_enable=YES
+
+# You may override where the log file goes if you like. The default is shown
+# below.
+
+/* /var/log/vsftpd.logに接続・転送を記録(2/3) */
+xferlog_file=/var/log/vsftpd.log
+
+# If you want, you can have your log file in standard ftpd xferlog format
+
+/* /var/log/vsftpd.logに接続・転送を記録(3/3) */
+xferlog_std_format=NO
+
+# By default the server will pretend to allow ASCII mode but in fact ignore
+# the request. Turn on the below options to have the server actually do ASCII
+# mangling on files when in ASCII mode.
+# Beware that on some FTP servers, ASCII support allows a denial of service
+# attack (DoS) via the command "SIZE /big/file" in ASCII mode. vsftpd
+# predicted this attack and has always been safe, reporting the size of the
+# raw file.
+# ASCII mangling is a horrible feature of the protocol.
+
+/* アスキーモードでのアップロードを許可 */
+ascii_upload_enable=YES
+
+/* アスキーモードでのダウンロードを許可 */
+ascii_download_enable=YES
+
+# You may fully customise the login banner string:
+
+/* FTPログイン時にソフト名とバージョンが表示されないようにする */
+ftpd_banner=Welcome to blah FTP service.
+
+# You may specify an explicit list of local users to chroot() to their home
+# directory. If chroot_local_user is YES, then this list becomes a list of
+# users to NOT chroot().
+
+/* デフォルトでホームディレクトリより上層へのアクセスを禁止する */
+chroot_local_user=YES
+
+/* ホームディレクトリより上層へのアクセスを許可するユーザのリストの有効化 */
+chroot_list_enable=YES
+# (default follows)
+
+/* ホームディレクトリより上層へのアクセスを許可するユーザのリスト */
+chroot_list_file=/etc/vsftpd/chroot_list
+
+# You may activate the "-R" option to the builtin ls. This is disabled by
+# default to avoid remote users being able to cause excessive I/O on large
+# sites. However, some broken FTP clients such as "ncftp" and "mirror" assume
+# the presence of the "-R" option, so there is a strong case for enabling it.
+
+/* ディレクトリごと削除できるようにする */
+ls_recurse_enable=YES
+
+/* 以下を最下行へ追加 */
+
+/* タイムスタンプ時間を日本時間にする */
+use_localtime=YES
+
+/* PASVモード接続先IPアドレスをホスト名から取得する */
+pasv_addr_resolve=YES
+
+/* PASVモード接続先IPアドレスが牽けるホスト名※ */
+pasv_address=hogehoge.ddo.jp
+
+/* PASVモード接続時の最小ポート番号 */
+pasv_min_port=60000
+
+/* PASVモード接続時の最大ポート番号 */
+pasv_max_port=60030
+
+/* SSLの有効化 */
+ssl_enable=YES
+
+/* サーバー証明書を指定 */
+rsa_cert_file=/etc/pki/tls/certs/vsftpd.pem
+
+/* ログイン時にSSL接続を強制しない※暗号化しない接続もできるようにする場合のみ */
+force_local_logins_ssl=NO
+
+/* データ転送時にSSL接続を強制しない※暗号化しない接続もできるようにする場合のみ */
+force_local_data_ssl=NO
