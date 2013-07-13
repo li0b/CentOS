@@ -30,4 +30,4 @@ http://www.apache.jp/
 
 ・PHP - PHPマニュアル
 
-php.net/manual/ja/index.php
+http://php.net/manual/ja/index.php
