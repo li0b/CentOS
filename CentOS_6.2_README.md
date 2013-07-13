@@ -14,5 +14,20 @@ CentOS（セントオーエス）とは、Red Hat Enterprise Linux（以下「RH
 
 各種ソフトウェアの互換性について：
 
-各種ソフトウェアの互換性については、http://centos.org[公式サイト]を参照するか、OSS関連のコミュニティサイトをご利用下さい。
+各種ソフトウェアの互換性については、以下のサイトをご利用下さい。
 
+・CentOS - Community ENTerprise Operating System
+
+http://centos.org/
+
+・iptables - ファイアウォール構築(iptables)
+
+http://centossrv.com/iptables.shtml
+
+・Apache - 日本 Apache ユーザー会
+
+http://www.apache.jp/
+
+・PHP - PHPマニュアル
+
+php.net/manual/ja/index.php
